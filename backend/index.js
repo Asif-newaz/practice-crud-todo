@@ -19,6 +19,7 @@ mongoose
 // Todo Schema and Model
 const todoSchema = new mongoose.Schema({
   title: { type: String, required: true },
+  description: { type: String, required: false },
   completed: { type: Boolean, default: false },
 });
 const Todo = mongoose.model("Todo", todoSchema);
@@ -28,8 +29,13 @@ const Todo = mongoose.model("Todo", todoSchema);
 app.post("/api/todos", async (req, res) => {
   // Note the colon before 'id'
   try {
-    const { title, completed, id } = req.body;
-    const todo = new Todo({ id: id, title: title, completed: completed });
+    const { title, description, completed, id } = req.body;
+    const todo = new Todo({
+      id: id,
+      title: title,
+      description: description,
+      completed: completed,
+    });
     await todo.save();
     res.status(201).json(todo);
   } catch (err) {
@@ -51,10 +57,10 @@ app.get("/api/todos", async (req, res) => {
 app.put("/api/todos/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, completed } = req.body;
+    const { title, completed, description } = req.body;
     const todo = await Todo.findByIdAndUpdate(
       id,
-      { title, completed },
+      { title, completed, description },
       { new: true }
     );
     res.status(200).json(todo);
